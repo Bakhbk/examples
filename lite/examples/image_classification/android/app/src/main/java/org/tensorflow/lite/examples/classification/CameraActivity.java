@@ -39,6 +39,7 @@ import androidx.annotation.UiThread;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import android.util.Size;
+import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -52,6 +53,8 @@ import android.widget.Toast;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import java.nio.ByteBuffer;
 import java.util.List;
+
+import org.tensorflow.lite.examples.classification.databinding.ActivityCameraBinding;
 import org.tensorflow.lite.examples.classification.env.ImageUtils;
 import org.tensorflow.lite.examples.classification.env.Logger;
 import org.tensorflow.lite.examples.classification.tflite.Classifier.Device;
@@ -82,7 +85,7 @@ public abstract class CameraActivity extends AppCompatActivity
   private LinearLayout bottomSheetLayout;
   private LinearLayout gestureLayout;
   private BottomSheetBehavior sheetBehavior;
-  protected TextView recognitionTextView,
+  private TextView
       recognition1TextView,
       recognition2TextView,
       recognitionValueTextView,
@@ -97,11 +100,11 @@ public abstract class CameraActivity extends AppCompatActivity
   private ImageView plusImageView, minusImageView;
   private Spinner modelSpinner;
   private Spinner deviceSpinner;
-  private TextView threadsTextView;
 
   private Model model = Model.QUANTIZED;
   private Device device = Device.CPU;
   private int numThreads = -1;
+  private ActivityCameraBinding binding;
 
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
@@ -109,7 +112,7 @@ public abstract class CameraActivity extends AppCompatActivity
     super.onCreate(null);
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-    setContentView(R.layout.activity_camera);
+    binding = ActivityCameraBinding.inflate(LayoutInflater.from(this));
     Toolbar toolbar = findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
     getSupportActionBar().setDisplayShowTitleEnabled(false);
@@ -120,7 +123,6 @@ public abstract class CameraActivity extends AppCompatActivity
       requestPermission();
     }
 
-    threadsTextView = findViewById(R.id.threads);
     plusImageView = findViewById(R.id.plus);
     minusImageView = findViewById(R.id.minus);
     modelSpinner = findViewById(R.id.model_spinner);
@@ -177,7 +179,6 @@ public abstract class CameraActivity extends AppCompatActivity
           public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
 
-    recognitionTextView = findViewById(R.id.detected_item);
     recognitionValueTextView = findViewById(R.id.detected_item_value);
     recognition1TextView = findViewById(R.id.detected_item1);
     recognition1ValueTextView = findViewById(R.id.detected_item1_value);
@@ -198,7 +199,7 @@ public abstract class CameraActivity extends AppCompatActivity
 
     model = Model.valueOf(modelSpinner.getSelectedItem().toString().toUpperCase());
     device = Device.valueOf(deviceSpinner.getSelectedItem().toString());
-    numThreads = Integer.parseInt(threadsTextView.getText().toString().trim());
+    numThreads = Integer.parseInt(binding.bottomSheetLayout.threads.getText().toString().trim());
   }
 
   protected int[] getRgbBytes() {
@@ -528,7 +529,7 @@ public abstract class CameraActivity extends AppCompatActivity
     if (results != null && results.size() >= 3) {
       Recognition recognition = results.get(0);
       if (recognition != null) {
-        if (recognition.getTitle() != null) recognitionTextView.setText(recognition.getTitle());
+        if (recognition.getTitle() != null) binding.bottomSheetLayout.detectedItem.setText(recognition.getTitle());
         if (recognition.getConfidence() != null)
           recognitionValueTextView.setText(
               String.format("%.2f", (100 * recognition.getConfidence())) + "%");
@@ -595,7 +596,7 @@ public abstract class CameraActivity extends AppCompatActivity
       final boolean threadsEnabled = device == Device.CPU;
       plusImageView.setEnabled(threadsEnabled);
       minusImageView.setEnabled(threadsEnabled);
-      threadsTextView.setText(threadsEnabled ? String.valueOf(numThreads) : "N/A");
+      binding.bottomSheetLayout.threads.setText(threadsEnabled ? String.valueOf(numThreads) : "N/A");
       onInferenceConfigurationChanged();
     }
   }
@@ -625,19 +626,19 @@ public abstract class CameraActivity extends AppCompatActivity
   @Override
   public void onClick(View v) {
     if (v.getId() == R.id.plus) {
-      String threads = threadsTextView.getText().toString().trim();
+      String threads = binding.bottomSheetLayout.threads.getText().toString().trim();
       int numThreads = Integer.parseInt(threads);
       if (numThreads >= 9) return;
       setNumThreads(++numThreads);
-      threadsTextView.setText(String.valueOf(numThreads));
+      binding.bottomSheetLayout.threads.setText(String.valueOf(numThreads));
     } else if (v.getId() == R.id.minus) {
-      String threads = threadsTextView.getText().toString().trim();
+      String threads = binding.bottomSheetLayout.threads.getText().toString().trim();
       int numThreads = Integer.parseInt(threads);
       if (numThreads == 1) {
         return;
       }
       setNumThreads(--numThreads);
-      threadsTextView.setText(String.valueOf(numThreads));
+      binding.bottomSheetLayout.threads.setText(String.valueOf(numThreads));
     }
   }
 
