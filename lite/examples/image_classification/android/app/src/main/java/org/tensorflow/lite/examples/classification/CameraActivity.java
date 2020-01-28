@@ -113,9 +113,11 @@ public abstract class CameraActivity extends AppCompatActivity
     getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
     binding = ActivityCameraBinding.inflate(LayoutInflater.from(this));
-    Toolbar toolbar = findViewById(R.id.toolbar);
+    Toolbar toolbar = binding.toolbar;
     setSupportActionBar(toolbar);
-    getSupportActionBar().setDisplayShowTitleEnabled(false);
+    if (getSupportActionBar() != null) {
+      getSupportActionBar().setDisplayShowTitleEnabled(false);
+    }
 
     if (hasPermission()) {
       setFragment();
@@ -123,14 +125,14 @@ public abstract class CameraActivity extends AppCompatActivity
       requestPermission();
     }
 
-    plusImageView = findViewById(R.id.plus);
-    minusImageView = findViewById(R.id.minus);
-    modelSpinner = findViewById(R.id.model_spinner);
-    deviceSpinner = findViewById(R.id.device_spinner);
-    bottomSheetLayout = findViewById(R.id.bottom_sheet_layout);
-    gestureLayout = findViewById(R.id.gesture_layout);
+    plusImageView = binding.bottomSheetLayout.plus;
+    minusImageView = binding.bottomSheetLayout.minus;
+    modelSpinner = binding.bottomSheetLayout.modelSpinner;
+    deviceSpinner = binding.bottomSheetLayout.deviceSpinner;
+    bottomSheetLayout = binding.bottomSheetLayout.bottomSheetLayout;
+    gestureLayout = binding.bottomSheetLayout.gestureLayout;
     sheetBehavior = BottomSheetBehavior.from(bottomSheetLayout);
-    bottomSheetArrowImageView = findViewById(R.id.bottom_sheet_arrow);
+    bottomSheetArrowImageView = binding.bottomSheetLayout.bottomSheetArrow;
 
     ViewTreeObserver vto = gestureLayout.getViewTreeObserver();
     vto.addOnGlobalLayoutListener(
@@ -179,17 +181,17 @@ public abstract class CameraActivity extends AppCompatActivity
           public void onSlide(@NonNull View bottomSheet, float slideOffset) {}
         });
 
-    recognitionValueTextView = findViewById(R.id.detected_item_value);
-    recognition1TextView = findViewById(R.id.detected_item1);
-    recognition1ValueTextView = findViewById(R.id.detected_item1_value);
-    recognition2TextView = findViewById(R.id.detected_item2);
-    recognition2ValueTextView = findViewById(R.id.detected_item2_value);
+    recognitionValueTextView = binding.bottomSheetLayout.detectedItemValue;
+    recognition1TextView = binding.bottomSheetLayout.detectedItem1;
+    recognition1ValueTextView = binding.bottomSheetLayout.detectedItem1Value;
+    recognition2TextView = binding.bottomSheetLayout.detectedItem2;
+    recognition2ValueTextView = binding.bottomSheetLayout.detectedItem2Value;
 
-    frameValueTextView = findViewById(R.id.frame_info);
-    cropValueTextView = findViewById(R.id.crop_info);
-    cameraResolutionTextView = findViewById(R.id.view_info);
-    rotationTextView = findViewById(R.id.rotation_info);
-    inferenceTimeTextView = findViewById(R.id.inference_info);
+    frameValueTextView = binding.bottomSheetLayout.frameInfo;
+    cropValueTextView = binding.bottomSheetLayout.cropInfo;
+    cameraResolutionTextView = binding.bottomSheetLayout.viewInfo;
+    rotationTextView = binding.bottomSheetLayout.rotationInfo;
+    inferenceTimeTextView = binding.bottomSheetLayout.inferenceInfo;
 
     modelSpinner.setOnItemSelectedListener(this);
     deviceSpinner.setOnItemSelectedListener(this);
